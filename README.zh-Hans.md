@@ -16,7 +16,7 @@
 
 ## 在 iPad 上打开
 
-1. 在提供启动脚本的 PythonIDE 版本中，进入**示例 → iPad VSCode**，用普通编辑器打开 **`iPadVSCode.py`**，点 **▶**。首次运行从 GitHub 下载约 4.3 MiB，校验完成后自动打开 `Hello` 项目。[查看启动脚本](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/v0.2.1/WorkbenchLauncher/iPadVSCode.py)
+1. 在提供启动脚本的 PythonIDE 版本中，从**本地工作区根目录**进入 **iPad VSCode** 文件夹，用普通编辑器打开 **`iPadVSCode.py`**，点 **▶**。首次运行从 GitHub 下载约 4.3 MiB，校验完成后自动打开 `Hello` 项目。[查看启动脚本](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/v0.2.1/WorkbenchLauncher/iPadVSCode.py)
 2. 在左侧打开 `main.py`，点编辑器标题栏的 **▶**，在下方查看输出。也可以运行 `demo.js`，或在 `index.html`、`notes.md` 中点预览图标。
 3. 下次仍然运行 **`iPadVSCode.py`**，已安装的工作台可以离线打开。下载中断后，重新运行即可重试。
 

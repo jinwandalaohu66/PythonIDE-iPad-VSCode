@@ -16,7 +16,7 @@ An open-source Code-OSS workbench for PythonIDE on iPad. Run Python and JavaScri
 
 ## Open on iPad
 
-1. In a version of PythonIDE that includes the launcher, open **Samples → iPad VSCode → `iPadVSCode.py`** in the regular script editor and tap **▶**. On the first run the launcher downloads the pinned release (about 4.3 MiB) from GitHub, verifies its SHA-256 and opens the **Hello** project. You can inspect the [launcher source](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/v0.2.1/WorkbenchLauncher/iPadVSCode.py).
+1. In a version of PythonIDE that includes the launcher, open the **iPad VSCode** folder at the top of the local workspace, open **`iPadVSCode.py`** in the regular script editor and tap **▶**. On the first run the launcher downloads the pinned release (about 4.3 MiB) from GitHub, verifies its SHA-256 and opens the **Hello** project. You can inspect the [launcher source](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/v0.2.1/WorkbenchLauncher/iPadVSCode.py).
 2. Select `main.py` in the workbench and tap **▶** in its editor tab. Read the result in **Run Output**. Try `demo.js` or select the preview icon in `index.html` or `notes.md`.
 3. Run **the same launcher** to reopen your installed workbench offline. If the download was interrupted, run it again. To open your own project, place its folder beside `PythonIDEWorkbench` in the local workspace, reopen the workbench, then choose **File → Open Project Folder…**.
 
