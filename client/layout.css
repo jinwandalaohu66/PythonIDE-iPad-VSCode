@@ -1,0 +1,20 @@
+:root { color-scheme: dark; font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #181818; color: #ccc; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+#workbench { position: relative; width: 100%; height: var(--viewport-height, 100dvh); overflow: hidden; }
+#loading { position: fixed; inset: 0; display: grid; align-content: center; justify-items: center; gap: 12px; background: #181818; }
+#loading strong { font-weight: 550; font-size: 17px; }
+#loading span { font-size: 13px; color: #aaa; }
+#loading button { border: 0; padding: 9px 16px; background: transparent; color: #78baf5; font: inherit; cursor: pointer; }
+#loading[hidden], #workbench[hidden], .wb-output [hidden] { display: none; }
+.wb-output { box-sizing: border-box; color: var(--vscode-panel-foreground, var(--vscode-editor-foreground)); width: 100%; padding: 5px 14px 10px; }
+.wb-output pre, .wb-output input { font: var(--vscode-editor-font-size, 13px)/1.55 var(--monaco-monospace-font, ui-monospace, Menlo, monospace); }
+.wb-output pre { user-select: text; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.wb-output .run-error { color: var(--vscode-errorForeground); }
+.wb-output .state { display: block; font-size: 12px; margin: 3px 0 6px; color: var(--vscode-descriptionForeground); }
+.wb-output form { display: flex; align-items: center; max-width: 48rem; margin: 7px 0; border: 1px solid var(--vscode-input-border, var(--vscode-focusBorder)); background: var(--vscode-input-background); }
+.wb-output input { flex: 1; min-width: 0; border: 0; padding: 6px 9px; background: transparent; color: var(--vscode-input-foreground); font-size: 16px; }
+.wb-output button { border: 0; background: transparent; font: inherit; color: var(--vscode-textLink-foreground); cursor: pointer; }
+.wb-output form button { min-height: 34px; padding: 0 12px; }
+.wb-output .frames { display: flex; flex-wrap: wrap; gap: 5px 12px; padding-top: 5px; }
+.wb-output .frames button { padding: 3px 0; text-decoration: underline; }
+.wb-preview, .wb-preview iframe { width: 100%; height: 100%; margin: 0; padding: 0; border: 0; display: block; }

@@ -1,0 +1,38 @@
+{
+  "name": "pythonide-workbench-client",
+  "private": true,
+  "version": "0.2.1",
+  "type": "module",
+  "scripts": {
+    "build": "vite build && node notices.mjs"
+  },
+  "dependencies": {
+    "@codingame/monaco-vscode-api": "40.1.0",
+    "@codingame/monaco-vscode-configuration-service-override": "40.1.0",
+    "@codingame/monaco-vscode-css-default-extension": "40.1.0",
+    "@codingame/monaco-vscode-dialogs-service-override": "40.1.0",
+    "@codingame/monaco-vscode-explorer-service-override": "40.1.0",
+    "@codingame/monaco-vscode-files-service-override": "40.1.0",
+    "@codingame/monaco-vscode-html-default-extension": "40.1.0",
+    "@codingame/monaco-vscode-javascript-default-extension": "40.1.0",
+    "@codingame/monaco-vscode-language-pack-zh-hans": "40.1.0",
+    "@codingame/monaco-vscode-languages-service-override": "40.1.0",
+    "@codingame/monaco-vscode-markdown-basics-default-extension": "40.1.0",
+    "@codingame/monaco-vscode-model-service-override": "40.1.0",
+    "@codingame/monaco-vscode-notifications-service-override": "40.1.0",
+    "@codingame/monaco-vscode-python-default-extension": "40.1.0",
+    "@codingame/monaco-vscode-search-service-override": "40.1.0",
+    "@codingame/monaco-vscode-storage-service-override": "40.1.0",
+    "@codingame/monaco-vscode-textmate-service-override": "40.1.0",
+    "@codingame/monaco-vscode-theme-defaults-default-extension": "40.1.0",
+    "@codingame/monaco-vscode-theme-service-override": "40.1.0",
+    "@codingame/monaco-vscode-workbench-service-override": "40.1.0",
+    "dompurify": "3.4.17",
+    "marked": "14.0.0",
+    "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@40.1.0",
+    "vscode": "npm:@codingame/monaco-vscode-extension-api@40.1.0"
+  },
+  "devDependencies": {
+    "vite": "7.3.1"
+  }
+}

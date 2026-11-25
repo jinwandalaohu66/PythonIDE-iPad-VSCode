@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local weather notes</title>
+<link rel="stylesheet" href="weather.css">
+<main>
+  <h1>Local weather notes</h1>
+  <p>Three readings from the garden thermometer.</p>
+  <ol><li>Morning · 18 °C</li><li>Noon · 21 °C</li><li>Afternoon · 24 °C</li></ol>
+  <button type="button">Show average</button>
+  <output></output>
+</main>
+<script>
+  document.querySelector('button').addEventListener('click', () => {
+    document.querySelector('output').textContent = '21 °C'
+  })
+</script>
+</html>

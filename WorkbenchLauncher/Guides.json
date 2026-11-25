@@ -1,0 +1,102 @@
+{
+  "en": {
+    "name": "Quick Start.md",
+    "paragraphs": [
+      "Open **`iPadVSCode.py`** in the PythonIDE editor and tap **▶**. The first run downloads about 4.3 MiB from GitHub, verifies the file and opens the **Hello** project. If the connection drops, run the same script again.",
+      "Next time, run **`iPadVSCode.py`** again. The installed workbench opens offline.",
+      "Select `main.py` in the file tree and tap ▶ in the editor tab to see its output. Run `demo.js` for JavaScript, or use the preview icon in `index.html` or `notes.md`.",
+      "To edit your own project, place its folder beside `PythonIDEWorkbench` in the local workspace. Reopen the workbench and choose **File → Open Project Folder…**.",
+      "For a manual installation, unzip the release in the local workspace and run the **top-level `main.py`** in PythonIDE. Python uses the app’s existing Pro library entitlements."
+    ]
+  },
+  "zh-Hans": {
+    "name": "使用说明.md",
+    "paragraphs": [
+      "用 PythonIDE 编辑器打开 **`iPadVSCode.py`**，点 **▶**。首次运行会从 GitHub 下载约 4.3 MiB，校验后自动打开 **Hello** 示例项目。下载中断后，再运行一次即可。",
+      "下次仍然运行 **`iPadVSCode.py`**，已安装的工作台可以离线打开。",
+      "在左侧文件树选 `main.py`，点编辑器标题栏的 ▶ 查看输出。可以运行 `demo.js` 体验 JavaScript，也可以打开 `index.html` 或 `notes.md`，点预览图标查看效果。",
+      "将自己的项目文件夹放在本地工作区，与 `PythonIDEWorkbench` 并排。重开工作台后，选「文件 → 打开项目文件夹…」。",
+      "手动安装时，将发行 ZIP 解压到本地工作区，在 PythonIDE 中运行**最外层的 `main.py`**。Python 专业库沿用 App 的会员规则。"
+    ]
+  },
+  "zh-Hant": {
+    "name": "使用說明.md",
+    "paragraphs": [
+      "用 PythonIDE 編輯器開啟 **`iPadVSCode.py`**，點選 **▶**。首次執行會從 GitHub 下載約 4.3 MiB，驗證後會自動開啟 **Hello** 範例專案。下載中斷時，再執行一次即可。",
+      "下次仍然執行 **`iPadVSCode.py`**，已安裝的工作台可離線開啟。",
+      "在左側檔案樹選取 `main.py`，點選編輯器標題列的 ▶ 查看輸出。執行 `demo.js` 可試用 JavaScript，也可以開啟 `index.html` 或 `notes.md`，點選預覽圖示查看結果。",
+      "將自己的專案資料夾放在本機工作區，與 `PythonIDEWorkbench` 並列。重新開啟工作台後，從「檔案」選單開啟專案資料夾。",
+      "如需手動安裝，請將發行版 ZIP 解壓縮至本機工作區，並在 PythonIDE 執行**最外層的 `main.py`**。Python 專業套件沿用 App 的會員權益。"
+    ]
+  },
+  "de": {
+    "name": "Kurzanleitung.md",
+    "paragraphs": [
+      "Öffne **`iPadVSCode.py`** im PythonIDE-Editor und tippe auf **▶**. Beim ersten Start werden etwa 4,3 MiB von GitHub geladen und überprüft. Anschließend öffnet sich das Beispielprojekt **Hello**. Bei einem Verbindungsabbruch kannst du das Skript erneut starten.",
+      "Starte später wieder **`iPadVSCode.py`**. Die installierte Arbeitsumgebung lässt sich offline öffnen.",
+      "Wähle `main.py` im Dateibaum und tippe im Editortab auf ▶, um die Ausgabe zu sehen. Probiere `demo.js` für JavaScript oder die Vorschau von `index.html` und `notes.md` aus.",
+      "Lege deinen eigenen Projektordner im lokalen Arbeitsbereich neben `PythonIDEWorkbench`. Öffne die Arbeitsumgebung erneut und wähle im Menü **File** den Befehl **Open Project Folder…**.",
+      "Für die manuelle Installation entpackst du die Release-ZIP im lokalen Arbeitsbereich und startest die **`main.py` im obersten Ordner** in PythonIDE. Für Python-Bibliotheken gelten die Pro-Berechtigungen der App."
+    ]
+  },
+  "es": {
+    "name": "Guía rápida.md",
+    "paragraphs": [
+      "Abre **`iPadVSCode.py`** en el editor de PythonIDE y toca **▶**. La primera vez se descargan unos 4,3 MiB desde GitHub. Tras verificar el archivo, se abre el proyecto **Hello**. Si se interrumpe la descarga, ejecuta el script de nuevo.",
+      "En adelante, vuelve a ejecutar **`iPadVSCode.py`**. El entorno instalado se puede abrir sin conexión.",
+      "Selecciona `main.py` en el árbol de archivos y toca ▶ en la pestaña del editor para ver la salida. Prueba `demo.js` para ejecutar JavaScript o abre la vista previa de `index.html` o `notes.md`.",
+      "Coloca la carpeta de tu proyecto junto a `PythonIDEWorkbench` en el espacio de trabajo local. Abre de nuevo el entorno y elige **File → Open Project Folder…**.",
+      "Para instalarlo manualmente, descomprime el ZIP de la versión en el espacio de trabajo local y ejecuta en PythonIDE el **`main.py` de la carpeta principal**. Las bibliotecas Pro de Python utilizan los permisos de la app."
+    ]
+  },
+  "fr": {
+    "name": "Prise en main.md",
+    "paragraphs": [
+      "Ouvrez **`iPadVSCode.py`** dans l’éditeur de PythonIDE et touchez **▶**. Au premier lancement, environ 4,3 Mio sont téléchargés depuis GitHub. Une fois le fichier vérifié, le projet **Hello** s’ouvre. Si le téléchargement est interrompu, relancez le script.",
+      "La prochaine fois, relancez **`iPadVSCode.py`**. Une fois installé, l’atelier s’ouvre hors connexion.",
+      "Sélectionnez `main.py` dans l’arborescence et touchez ▶ dans l’onglet de l’éditeur pour voir le résultat. Essayez `demo.js` pour JavaScript ou l’aperçu de `index.html` et de `notes.md`.",
+      "Placez votre dossier de projet à côté de `PythonIDEWorkbench` dans l’espace de travail local. Rouvrez l’atelier et choisissez **File → Open Project Folder…**.",
+      "Pour une installation manuelle, décompressez le ZIP dans l’espace de travail local et exécutez le **`main.py` à la racine du dossier** dans PythonIDE. Les bibliothèques Python Pro utilisent les droits de l’app."
+    ]
+  },
+  "ja": {
+    "name": "使い方.md",
+    "paragraphs": [
+      "PythonIDE のエディタで **`iPadVSCode.py`** を開き、**▶** をタップします。初回は GitHub から約 4.3 MiB をダウンロードし、ファイルを検証してから **Hello** サンプルを開きます。途中で切断された場合は、同じスクリプトをもう一度実行してください。",
+      "次回も **`iPadVSCode.py`** を実行します。インストール後はオフラインでも開けます。",
+      "ファイルツリーで `main.py` を選び、エディタのタブにある ▶ をタップすると出力が表示されます。JavaScript は `demo.js` で試せます。`index.html` と `notes.md` はプレビューアイコンから表示できます。",
+      "自分のプロジェクトフォルダをローカルワークスペースの `PythonIDEWorkbench` と同じ階層に置きます。ワークベンチを開き直し、**File → Open Project Folder…** を選択します。",
+      "手動でインストールする場合はリリースの ZIP をローカルワークスペースに展開し、PythonIDE で**最上位の `main.py`** を実行します。Python の Pro ライブラリにはアプリの利用権が適用されます。"
+    ]
+  },
+  "ko": {
+    "name": "빠른 시작.md",
+    "paragraphs": [
+      "PythonIDE 편집기에서 **`iPadVSCode.py`** 파일을 열고 **▶**를 누르세요. 처음 실행하면 GitHub에서 약 4.3 MiB를 다운로드하고 파일을 확인한 뒤 **Hello** 예제 프로젝트를 엽니다. 다운로드가 끊기면 같은 스크립트를 다시 실행하세요.",
+      "다음에도 **`iPadVSCode.py`**를 실행하세요. 설치한 워크벤치는 오프라인에서도 열립니다.",
+      "파일 트리에서 `main.py`를 선택하고 편집기 탭의 ▶를 눌러 출력을 확인하세요. `demo.js`로 JavaScript를 실행하거나 `index.html`과 `notes.md`의 미리 보기를 열 수 있습니다.",
+      "로컬 작업 공간에서 프로젝트 폴더를 `PythonIDEWorkbench`와 같은 위치에 두세요. 워크벤치를 다시 열고 **File → Open Project Folder…** 를 선택하세요.",
+      "직접 설치하려면 릴리스 ZIP을 로컬 작업 공간에 풀고 PythonIDE에서 **최상위 폴더의 `main.py`** 를 실행하세요. Python Pro 라이브러리에는 앱의 멤버십 권한이 적용됩니다."
+    ]
+  },
+  "pt-BR": {
+    "name": "Guia rápido.md",
+    "paragraphs": [
+      "Abra **`iPadVSCode.py`** no editor do PythonIDE e toque em **▶**. Na primeira execução, o script baixa cerca de 4,3 MiB do GitHub, verifica o arquivo e abre o projeto **Hello**. Se o download for interrompido, execute o script novamente.",
+      "Nas próximas vezes, execute o mesmo **`iPadVSCode.py`**. Após a instalação, o ambiente abre mesmo sem internet.",
+      "Selecione `main.py` na árvore de arquivos e toque em ▶ na aba do editor para ver a saída. Experimente `demo.js` para executar JavaScript ou abra a prévia de `index.html` e `notes.md`.",
+      "Coloque a pasta do seu projeto ao lado de `PythonIDEWorkbench` na área de trabalho local. Reabra o ambiente e selecione **File → Open Project Folder…**.",
+      "Para instalar manualmente, extraia o ZIP da versão na área de trabalho local e execute no PythonIDE o **`main.py` da pasta principal**. As bibliotecas Pro do Python usam as permissões do app."
+    ]
+  },
+  "ru": {
+    "name": "Краткое руководство.md",
+    "paragraphs": [
+      "Откройте **`iPadVSCode.py`** в редакторе PythonIDE и нажмите **▶**. При первом запуске скрипт загрузит с GitHub около 4,3 МиБ, проверит файл и откроет пример **Hello**. Если загрузка прервётся, снова запустите скрипт.",
+      "В следующий раз запустите тот же **`iPadVSCode.py`**. Установленная среда открывается без подключения к интернету.",
+      "Выберите `main.py` в дереве файлов и нажмите ▶ на вкладке редактора, чтобы увидеть вывод. Запустите `demo.js`, чтобы попробовать JavaScript, или откройте предпросмотр `index.html` и `notes.md`.",
+      "Поместите папку своего проекта рядом с `PythonIDEWorkbench` в локальной рабочей области. Откройте среду заново и выберите **File → Open Project Folder…**.",
+      "Для ручной установки распакуйте ZIP из выпуска в локальную рабочую область и запустите в PythonIDE **`main.py` из корня распакованной папки**. Доступ к библиотекам Python Pro определяется вашей подпиской или покупкой в приложении."
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#181818">
+  <link rel="icon" href="data:,">
+  <title>PythonIDE Workbench</title>
+  <script defer src="./launch.js"></script>
+</head>
+<body>
+  <main id="workbench" aria-label="Code editor"></main>
+  <section id="loading" aria-live="polite">
+    <strong>PythonIDE Workbench</strong>
+    <span id="message">Opening your workspace…</span>
+    <button id="startup-close" type="button">Close</button>
+  </section>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

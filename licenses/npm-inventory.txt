@@ -1,0 +1,46 @@
+Production dependency inventory
+Built from client/package-lock.json.
+
+@codingame/monaco-vscode-api  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-api/-/monaco-vscode-api-40.1.0.tgz
+@codingame/monaco-vscode-base-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-base-service-override/-/monaco-vscode-base-service-override-40.1.0.tgz
+@codingame/monaco-vscode-bulk-edit-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-bulk-edit-service-override/-/monaco-vscode-bulk-edit-service-override-40.1.0.tgz
+@codingame/monaco-vscode-configuration-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-configuration-service-override/-/monaco-vscode-configuration-service-override-40.1.0.tgz
+@codingame/monaco-vscode-css-default-extension  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-css-default-extension/-/monaco-vscode-css-default-extension-40.1.0.tgz
+@codingame/monaco-vscode-dialogs-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-dialogs-service-override/-/monaco-vscode-dialogs-service-override-40.1.0.tgz
+@codingame/monaco-vscode-environment-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-environment-service-override/-/monaco-vscode-environment-service-override-40.1.0.tgz
+@codingame/monaco-vscode-explorer-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-explorer-service-override/-/monaco-vscode-explorer-service-override-40.1.0.tgz
+@codingame/monaco-vscode-extensions-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-extensions-service-override/-/monaco-vscode-extensions-service-override-40.1.0.tgz
+@codingame/monaco-vscode-files-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-files-service-override/-/monaco-vscode-files-service-override-40.1.0.tgz
+@codingame/monaco-vscode-host-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-host-service-override/-/monaco-vscode-host-service-override-40.1.0.tgz
+@codingame/monaco-vscode-html-default-extension  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-html-default-extension/-/monaco-vscode-html-default-extension-40.1.0.tgz
+@codingame/monaco-vscode-javascript-default-extension  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-javascript-default-extension/-/monaco-vscode-javascript-default-extension-40.1.0.tgz
+@codingame/monaco-vscode-katex-common  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-katex-common/-/monaco-vscode-katex-common-40.1.0.tgz
+@codingame/monaco-vscode-keybindings-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-keybindings-service-override/-/monaco-vscode-keybindings-service-override-40.1.0.tgz
+@codingame/monaco-vscode-language-pack-zh-hans  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-language-pack-zh-hans/-/monaco-vscode-language-pack-zh-hans-40.1.0.tgz
+@codingame/monaco-vscode-languages-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-languages-service-override/-/monaco-vscode-languages-service-override-40.1.0.tgz
+@codingame/monaco-vscode-layout-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-layout-service-override/-/monaco-vscode-layout-service-override-40.1.0.tgz
+@codingame/monaco-vscode-markdown-basics-default-extension  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-markdown-basics-default-extension/-/monaco-vscode-markdown-basics-default-extension-40.1.0.tgz
+@codingame/monaco-vscode-model-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-model-service-override/-/monaco-vscode-model-service-override-40.1.0.tgz
+@codingame/monaco-vscode-notifications-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-notifications-service-override/-/monaco-vscode-notifications-service-override-40.1.0.tgz
+@codingame/monaco-vscode-python-default-extension  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-python-default-extension/-/monaco-vscode-python-default-extension-40.1.0.tgz
+@codingame/monaco-vscode-quickaccess-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-quickaccess-service-override/-/monaco-vscode-quickaccess-service-override-40.1.0.tgz
+@codingame/monaco-vscode-search-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-search-service-override/-/monaco-vscode-search-service-override-40.1.0.tgz
+@codingame/monaco-vscode-storage-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-storage-service-override/-/monaco-vscode-storage-service-override-40.1.0.tgz
+@codingame/monaco-vscode-textmate-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-textmate-service-override/-/monaco-vscode-textmate-service-override-40.1.0.tgz
+@codingame/monaco-vscode-theme-defaults-default-extension  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-theme-defaults-default-extension/-/monaco-vscode-theme-defaults-default-extension-40.1.0.tgz
+@codingame/monaco-vscode-theme-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-theme-service-override/-/monaco-vscode-theme-service-override-40.1.0.tgz
+@codingame/monaco-vscode-view-banner-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-view-banner-service-override/-/monaco-vscode-view-banner-service-override-40.1.0.tgz
+@codingame/monaco-vscode-view-common-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-view-common-service-override/-/monaco-vscode-view-common-service-override-40.1.0.tgz
+@codingame/monaco-vscode-view-status-bar-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-view-status-bar-service-override/-/monaco-vscode-view-status-bar-service-override-40.1.0.tgz
+@codingame/monaco-vscode-view-title-bar-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-view-title-bar-service-override/-/monaco-vscode-view-title-bar-service-override-40.1.0.tgz
+@codingame/monaco-vscode-workbench-service-override  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-workbench-service-override/-/monaco-vscode-workbench-service-override-40.1.0.tgz
+@types/trusted-types  2.0.7  MIT  https://registry.npmjs.org/@types/trusted-types/-/trusted-types-2.0.7.tgz
+@vscode/diff  0.0.2-7  MIT  https://registry.npmjs.org/@vscode/diff/-/diff-0.0.2-7.tgz
+@vscode/iconv-lite-umd  0.7.1  MIT  https://registry.npmjs.org/@vscode/iconv-lite-umd/-/iconv-lite-umd-0.7.1.tgz
+commander  8.3.0  MIT  https://registry.npmjs.org/commander/-/commander-8.3.0.tgz
+dompurify  3.4.17  (MPL-2.0 OR Apache-2.0)  https://registry.npmjs.org/dompurify/-/dompurify-3.4.17.tgz
+jschardet  3.1.4  LGPL-2.1+  https://registry.npmjs.org/jschardet/-/jschardet-3.1.4.tgz
+katex  0.16.47  MIT  https://registry.npmjs.org/katex/-/katex-0.16.47.tgz
+marked  14.0.0  MIT  https://registry.npmjs.org/marked/-/marked-14.0.0.tgz
+@codingame/monaco-vscode-editor-api  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-editor-api/-/monaco-vscode-editor-api-40.1.0.tgz
+@codingame/monaco-vscode-extension-api  40.1.0  MIT  https://registry.npmjs.org/@codingame/monaco-vscode-extension-api/-/monaco-vscode-extension-api-40.1.0.tgz
