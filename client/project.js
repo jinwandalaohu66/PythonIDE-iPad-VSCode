@@ -1,12 +1,13 @@
 import {Emitter, Event} from '@codingame/monaco-vscode-api/vscode/vs/base/common/event'
 import {CancellationError} from '@codingame/monaco-vscode-api/vscode/vs/base/common/errors'
+import {URI} from '@codingame/monaco-vscode-api/vscode/vs/base/common/uri'
 import {FileChangeType, FileSystemProviderCapabilities, FileSystemProviderErrorCode as Code, createFileSystemProviderError} from '@codingame/monaco-vscode-api/vscode/vs/platform/files/common/files'
 
 const errors = {NotFound:Code.FileNotFound, Exists:Code.FileExists, Denied:Code.NoPermissions, Conflict:Code.FileWriteLocked, Unavailable:Code.Unavailable}
-export async function request(action, fields = {}) {
-  const response = await fetch(new URL('rpc', document.baseURI), {
+export async function request(action, fields = {}, endpoint = new URL('rpc', document.baseURI), signal) {
+  const response = await fetch(endpoint, {
     method:'POST', headers:{'Content-Type':'application/json', 'X-Studio-Request':'1'},
-    body:JSON.stringify({action, ...fields})
+    body:JSON.stringify({action, ...fields}), signal
   })
   const result = await response.json()
   if (!response.ok) throw createFileSystemProviderError(result.error, errors[result.kind] || Code.Unknown)
@@ -32,8 +33,47 @@ export class ProjectFiles {
     this.revisions = new Map()
     this.requests = new Set()
     this.leaving = false
+    this.directories = new Map()
+    this.rootWatches = 0
   }
-  watch() { return {dispose() {}} }
+  watch() {
+    this.rootWatches++
+    this.scheduleWatch()
+    return {dispose:() => { this.rootWatches--; this.scheduleWatch() }}
+  }
+  scheduleWatch() {
+    clearTimeout(this.watchTimer)
+    if (this.rootWatches && !this.leaving && !document.hidden && !this.polling) {
+      this.watchTimer = setTimeout(() => this.refreshFolders(), 1600)
+    }
+  }
+  async refreshFolders() {
+    if (this.leaving || this.polling || document.hidden) return
+    this.polling = true
+    try {
+      const folders = [...this.directories]
+      for (let offset = 0; offset < folders.length && !this.leaving; offset += 64) {
+        const batch = folders.slice(offset, offset + 64)
+        const stamps = Object.fromEntries(batch.map(([path, folder]) => [path, folder.stamp]))
+        const changes = await this.call('folderChanges', {folders:stamps})
+        for (const [path, previous] of batch) {
+          const next = Object.hasOwn(changes, path) && changes[path]
+          if (!next || this.directories.get(path) !== previous) continue
+          if (next.stamp === null) this.directories.delete(path)
+          else this.directories.set(path, next)
+          const before = new Map(previous.entries), after = new Map(next.entries)
+          const events = []
+          for (const name of new Set([...before.keys(), ...after.keys()])) {
+            if (before.get(name) === after.get(name)) continue
+            const type = !after.has(name) ? FileChangeType.DELETED : !before.has(name) ? FileChangeType.ADDED : FileChangeType.UPDATED
+            events.push({type, resource:URI.from({scheme:'studio', path:[this.root, path, name].filter(Boolean).join('/')})})
+          }
+          if (events.length) this.events.fire(events)
+        }
+      }
+    } catch { /* Retry a transient local connection failure on the next visible poll. */ }
+    finally { this.polling = false; this.scheduleWatch() }
+  }
   relative(uri) {
     if (uri.scheme === 'studio' && uri.path === this.root) return ''
     if (uri.scheme === 'studio' && uri.path.startsWith(this.root + '/')) {
@@ -60,7 +100,12 @@ export class ProjectFiles {
     } catch (error) { this.leaving = false; throw error }
   }
   stat(uri) { return this.call('stat', {path:this.relative(uri)}) }
-  readdir(uri) { return this.call('list', {path:this.relative(uri)}) }
+  async readdir(uri) {
+    const path = this.relative(uri)
+    const listing = await this.call('list', {path, withStamp:true})
+    this.directories.set(path, listing)
+    return listing.entries
+  }
   async readFile(uri) {
     const path = this.relative(uri)
     const result = await this.call('read', {path})
@@ -70,7 +115,7 @@ export class ProjectFiles {
   }
   async writeFile(uri, data, opts) {
     const path = this.relative(uri)
-    const revision = this.revisions.get(path)
+    const revision = opts.create && !opts.overwrite ? undefined : this.revisions.get(path)
     const result = await this.call('write', {path, bytes:encode(data), revision, create:opts.create, overwrite:opts.overwrite})
     this.revisions.set(path, result.revision)
     this.events.fire([{type:revision ? FileChangeType.UPDATED : FileChangeType.ADDED, resource:uri}])
@@ -91,8 +136,13 @@ export class ProjectFiles {
     this.events.fire([{type:FileChangeType.DELETED, resource:from}, {type:FileChangeType.ADDED, resource:to}])
   }
   async delete(uri) {
-    await this.call('trash', {path:this.relative(uri)})
-    this.revisions.delete(this.relative(uri))
+    const removed = this.relative(uri)
+    await this.call('trash', {path:removed})
+    for (const map of [this.revisions, this.directories]) {
+      for (const path of map.keys()) {
+        if (path === removed || path.startsWith(removed + '/')) map.delete(path)
+      }
+    }
     this.events.fire([{type:FileChangeType.DELETED, resource:uri}])
   }
 }

@@ -4,6 +4,8 @@ English · [简体中文](README.zh-Hans.md)
 
 An open-source Code-OSS workbench for PythonIDE on iPad. Run Python and JavaScript on your device, edit files side by side, and preview HTML and Markdown offline. Python uses the app’s interpreter and its existing Pro library entitlements. The workbench interface is available in English and Simplified Chinese.
 
+**[Download PythonIDE on the App Store](https://apps.apple.com/app/id6753987304)** to run the workbench on your iPad.
+
 <p>
   <a href="https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/v0.2.1/screenshots/ipad-python.png"><img src="https://raw.githubusercontent.com/jinwandalaohu66/PythonIDE-iPad-VSCode/v0.2.1/screenshots/ipad-python.png" width="100%" alt="Python output beside a Markdown preview on an iPad simulator"></a>
 </p>
@@ -16,11 +18,13 @@ An open-source Code-OSS workbench for PythonIDE on iPad. Run Python and JavaScri
 
 ## Open on iPad
 
-1. In a version of PythonIDE that includes the launcher, open the **iPad VSCode** folder at the top of the local workspace, open **`iPadVSCode.py`** in the regular script editor and tap **▶**. On the first run the launcher downloads the pinned release (about 4.3 MiB) from GitHub, verifies its SHA-256 and opens the **Hello** project. You can inspect the [launcher source](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/v0.2.1/WorkbenchLauncher/iPadVSCode.py).
+1. In a version of PythonIDE that includes the launcher, open the **iPad VSCode** folder at the top of the local workspace, open **`iPadVSCode.py`** in the regular script editor and tap **▶**. On the first run the launcher downloads the latest compatible release from GitHub, verifies its SHA-256 and opens the **Hello** project. You can inspect the [launcher source](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/main/WorkbenchLauncher/iPadVSCode.py).
 2. Select `main.py` in the workbench and tap **▶** in its editor tab. Read the result in **Run Output**. Try `demo.js` or select the preview icon in `index.html` or `notes.md`.
 3. Run **the same launcher** to reopen your installed workbench offline. If the download was interrupted, run it again. To open your own project, place its folder beside `PythonIDEWorkbench` in the local workspace, reopen the workbench, then choose **File → Open Project Folder…**.
 
-**Manual installation** also works on versions with the required PythonIDE UI APIs. [Download the release ZIP](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/releases/download/v0.2.1/PythonIDEWorkbench.zip), unzip it in Files, and copy the entire `PythonIDEWorkbench` directory into PythonIDE’s local workspace. In the regular PythonIDE editor open its **top-level `main.py`** and tap **▶**. The separate `Projects/Hello/main.py` is the example you can run inside the workbench.
+Choose **Help → Check for Workbench Updates…** or use the command palette. Confirm the update, then close and reopen the workbench. Ordinary launches work offline. Your projects, edited examples, layout and drafts stay in place. The updated launcher also offers an upgrade from 0.2.1. Run it with `--update` to check again. If your app still has the original launcher, save and run the current script from the launcher source link above.
+
+**Manual installation** also works on versions with the required PythonIDE UI APIs. [Download the release ZIP](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/releases/latest/download/PythonIDEWorkbench.zip), unzip it in Files, and copy the entire `PythonIDEWorkbench` directory into PythonIDE’s local workspace. In the regular PythonIDE editor open its **top-level `main.py`** and tap **▶**. The separate `Projects/Hello/main.py` is the example you can run inside the workbench.
 
 ## Editing and running
 
@@ -39,6 +43,8 @@ Saving writes back to the original project. Switching projects or closing prompt
 
 Python scripts share the permissions of the host app. The workbench runs one foreground job at a time and keeps up to 65,536 characters of output. Stopping a native Python call may take until the call returns.
 
+Use Explorer to create, rename, move and delete project files and folders. Files created by a running script appear automatically. Quick Open finds filenames, and Search finds text in files you have never opened.
+
 ## Development
 
 The release includes the prebuilt interface. For a desktop preview with Python 3.11 or newer, run the following and open the local address printed in the terminal.
@@ -55,6 +61,6 @@ npm ci
 npm run build
 ```
 
-From the repository root, run `python3 -m unittest discover -s tests` to test the local service and `python3 tools/package.py ../PythonIDEWorkbench.zip` to build the release archive. The archive includes Python and frontend sources, the ready-to-use interface, examples and third-party notices. The GitHub screenshot gallery and the separate app launcher are distributed outside the ZIP.
+Run `python3 -m unittest discover -s tests` for the local service. To publish, run `python3 tools/package.py ../PythonIDEWorkbench.zip --channel releases.json --min-host 1.8.5` from the repository root, using the minimum host version you verified. Attach the ZIP and `releases.json` to the same published GitHub Release before marking it Latest. The catalog retains earlier compatible releases.
 
 The original PythonIDE workbench code is covered by the [MIT license](LICENSE). The editor uses [Code – OSS](https://github.com/microsoft/vscode) and the [Monaco VS Code API](https://github.com/CodinGame/monaco-vscode-api). Third-party license texts are in [licenses/](licenses/).

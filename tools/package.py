@@ -1,13 +1,15 @@
 """Build a reproducible source + offline bundle from this release tree."""
 
 import argparse
+import hashlib
+import json
 from pathlib import Path
 import tempfile
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUTS = (".gitignore", "LICENSE", "README.md", "README.zh-Hans.md", "CHANGELOG.md", "main.py", "studio", "client",
-          "web", "licenses", "Projects/Hello", "tools", "tests")
+          "web", "licenses", "Projects/Hello", "tools", "tests", "WorkbenchLauncher/iPadVSCode.py")
 
 
 def files():
@@ -49,4 +51,20 @@ def build(target):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("destination", type=Path)
-    build(parser.parse_args().destination.resolve())
+    parser.add_argument("--channel", type=Path, help="Update the compatible release list to attach beside the ZIP")
+    parser.add_argument("--min-host", help="Minimum compatible PythonIDE version for this release")
+    args = parser.parse_args()
+    if bool(args.channel) != bool(args.min_host):
+        parser.error("--channel and --min-host must be supplied together")
+    build(args.destination.resolve())
+    if args.channel:
+        import re
+        version = json.loads((ROOT / "client/package.json").read_text())["version"]
+        if not all(re.fullmatch(r"(0|[1-9][0-9]{0,5})(\.(0|[1-9][0-9]{0,5})){2}", v) for v in (args.min_host, version)):
+            parser.error("Use three numeric version components")
+        channel = json.loads(args.channel.read_text()) if args.channel.exists() else {"schema": 1, "releases": []}
+        releases = [r for r in channel["releases"] if r["version"] != version]
+        data = args.destination.read_bytes()
+        releases.insert(0, {"version": version, "minHost": args.min_host, "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
+        channel["releases"] = releases
+        args.channel.write_text(json.dumps(channel, indent=2) + "\n", encoding="utf-8")

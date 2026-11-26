@@ -30,15 +30,16 @@ class LocalServer(ThreadingHTTPServer):
 
 
 class Studio:
-    def __init__(self, package, external=None):
+    def __init__(self, package, external=None, home=None):
         self.package = Path(package).resolve()
+        self.home = Path(home).resolve() if home is not None else self.package
         self.web = self.package / "web"
         if not (self.web / "index.html").is_file():
             raise ValueError("Import the entire PythonIDEWorkbench folder, including web/.")
-        self.projects = discover(self.package, external)
+        self.projects = discover(self.home, external)
         if not self.projects:
             raise ValueError("Add a project folder inside Projects before opening the workbench.")
-        self.state = self.package / ".studio-project"
+        self.state = self.home / ".studio-project"
         default = next(iter(self.projects))
         if external is None:
             try:
@@ -48,7 +49,10 @@ class Studio:
             except OSError:
                 pass
         self.selected = self.projects[default]
-        self.drafts = Drafts(self.package)
+        self.drafts = Drafts(self.home)
+        self.update_lock = threading.Lock()
+        self.installer = None
+        self.available_release = None
         self.preview = Preview(self.selected)
         self.closing = False
         self.lock = threading.RLock()
@@ -79,8 +83,46 @@ class Studio:
                 self.http.server_close()
                 self.thread.join()
 
+    def update(self, action, req):
+        from importlib.util import module_from_spec, spec_from_file_location
+        from zipfile import BadZipFile
+
+        with self.update_lock:
+            if self.installer is None:
+                spec = spec_from_file_location(__package__ + ".installer", self.package / "WorkbenchLauncher/iPadVSCode.py")
+                module = module_from_spec(spec)
+                spec.loader.exec_module(module)
+                self.installer = module
+            installer = self.installer
+            try:
+                if action == "checkUpdate":
+                    self.available_release = None
+                    release = installer.latest_release(installer.host_version())
+                    current = installer.selected_version(self.home)
+                    if installer.version_key(release["version"]) > installer.version_key(current):
+                        self.available_release = release
+                    return {"version": release["version"] if self.available_release else None,
+                            "restart": current != installer.package_version(self.package)}
+                if not self.available_release or req.get("version") != self.available_release["version"]:
+                    return {"error": "changed"}
+                installer.install_update(self.home, self.available_release)
+                self.available_release = None
+                return {}
+            except installer.InstallError as error:
+                return {"error": error.args[0]}
+            except (BadZipFile, ValueError, KeyError):
+                return {"error": "integrity"}
+            except OSError:
+                return {"error": "storage"}
+
     def dispatch(self, req):
         action = req.get("action")
+        if action in ("checkUpdate", "installUpdate"):
+            # Downloading an optional program update must not hold the project or draft lock.
+            with self.lock:
+                if self.closing or req.get("project") != self.selected.key:
+                    raise Problem("Conflict", "The active project changed.")
+            return self.update(action, req)
         with self.lock:
             if self.closing:
                 raise Problem("Conflict", "The workbench has closed.")

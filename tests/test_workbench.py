@@ -32,6 +32,26 @@ class WorkbenchTests(unittest.TestCase):
     def call(self, action, **fields):
         return self.studio.dispatch({"project": self.key, "action": action, **fields})
 
+    def test_recursive_delete_recreate_and_external_listing(self):
+        project = self.studio.selected
+        original = project.root / "demo" / "a.py"
+        self.call("mkdir", path="demo")
+        self.call("write", path="demo/a.py", bytes="eA==", create=True, overwrite=False)
+        self.call("trash", path="demo")
+        self.assertFalse(original.exists())
+        self.call("mkdir", path="demo")
+        self.call("write", path="demo/a.py", bytes="eQ==", create=True, overwrite=False)
+        self.assertEqual(original.read_bytes(), b"y")
+        before = self.call("list", path="", withStamp=True)
+        self.assertEqual(self.call("folderChanges", folders={"":before["stamp"]}), {})
+        (project.root / "generated.csv").write_text("a,b")
+        changed = self.call("folderChanges", folders={"":before["stamp"]})
+        self.assertIn(["generated.csv", 1], changed[""]["entries"])
+        (project.root / "generated.csv").unlink()
+        after = self.call("folderChanges", folders={"":changed[""]["stamp"]})
+        self.assertNotIn(["generated.csv", 1], after[""]["entries"])
+        self.assertEqual(self.call("folderChanges", folders={"gone":"0"})["gone"], {"entries":[], "stamp":None})
+
     def test_script_arguments_apply_to_one_run(self):
         script = self.studio.selected.root / "main.py"
         script.write_text("import json, sys\nprint(json.dumps(sys.argv))\n", encoding="utf-8")

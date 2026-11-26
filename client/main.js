@@ -2,6 +2,11 @@ import './layout.css'
 
 const zh = navigator.language.toLowerCase().startsWith('zh')
 const t = zh ? {
+  update:'检查工作台更新…', upToDate:'已是此设备可用的最新版本。',
+  available:version => '工作台 '+version+' 可用。安装后，下次打开时使用新版，项目和草稿会保留。',
+  install:'安装更新', installed:'更新已安装。关闭并重新打开工作台即可使用。',
+  updateErrors:{modified:'原来的 main.py 已被修改。请保留当前工作台，将新版单独安装到另一文件夹。', network:'无法连接 GitHub，请稍后重试。', incompatible:'此 PythonIDE 版本暂无兼容的更新。', integrity:'下载包校验失败，请重试。',
+    storage:'无法写入更新，请检查可用空间。', conflict:'本机的程序文件已被更改，请保留此副本并单独安装新版。', changed:'发行版本已变化，请重新检查更新。'},
   run:'运行当前文件', preview:'在侧边打开预览', stop:'停止运行', close:'关闭工作台', project:'打开项目文件夹…',
   runWithArguments:'带参数运行…', argumentsPrompt:'输入本次运行的参数。含空格的参数请用引号括起来。',
   invalidArguments:'请补全未闭合的引号或末尾的转义字符。', choosePython:'请先打开一个 Python 文件。',
@@ -20,6 +25,11 @@ const t = zh ? {
   restored:'已重新连接本机工作台。', empty:'尚无运行输出', startedFailed:'工作台未能打开', previewTitle:'预览',
   closePanel:'关闭', type:'输入', untitled:'未命名'
 } : {
+  update:'Check for Workbench Updates…', upToDate:'This device has the latest compatible workbench.',
+  available:version => 'Workbench '+version+' is available. Your projects and drafts will be available when you next open the workbench.',
+  install:'Install Update', installed:'Update installed. Close and reopen the workbench to use it.',
+  updateErrors:{modified:'The original main.py was edited. Keep this copy and install the new release in a separate folder.', network:'Could not reach GitHub. Try again later.', incompatible:'No update supports this version of PythonIDE.', integrity:'The download failed verification. Please retry.',
+    storage:'Could not write the update. Check the available space.', conflict:'Local program files have changed. Keep this copy and install the release separately.', changed:'The release has changed. Check for updates again.'},
   run:'Run Active File', preview:'Open Preview to the Side', stop:'Stop Running File', close:'Close Workbench', project:'Open Project Folder…',
   runWithArguments:'Run with Arguments…', argumentsPrompt:'Enter arguments for this run. Quote arguments that contain spaces.',
   invalidArguments:'Finish the quoted argument or the trailing escape.', choosePython:'Open a Python file first.',

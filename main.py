@@ -3,6 +3,8 @@
 import importlib
 import importlib.util
 from pathlib import Path
+import re
+import runpy
 import sys
 
 
@@ -18,6 +20,20 @@ def package_root():
 
 def launch():
     root = package_root()
+    home = Path(globals().get("_workbench_home", root))
+    if root == home:
+        store = home / ".workbench-updates"
+        pointer = store / "current"
+        if not store.is_symlink() and not pointer.is_symlink() and pointer.is_file():
+            try:
+                version = pointer.read_text(encoding="ascii").strip()
+            except (UnicodeError, OSError):
+                version = ""
+            if re.fullmatch(r"[0-9]{1,6}(\.[0-9]{1,6}){2}", version):
+                entry = store / version / "main.py"
+                if entry.is_file() and entry.resolve() == entry and (entry.parent / "web/index.html").is_file():
+                    runpy.run_path(str(entry), init_globals={"_workbench_home":str(home)}, run_name="__main__")
+                    return
     # The host reuses an interpreter. Keep different imported copies independent.
     name = "_pythonide_workbench_" + format(id(root), "x")
     spec = importlib.util.spec_from_file_location(name, root / "studio" / "__init__.py")
@@ -36,7 +52,7 @@ def launch():
             options.add_argument("--port", type=int, default=0)
             args = options.parse_args()
             project, port = args.project, args.port
-        studio = server.Studio(root, project)
+        studio = server.Studio(root, project) if root == home else server.Studio(root, project, home)
         try:
             studio.listen(port)
             if preview:

@@ -1,4 +1,5 @@
-import {initialize, getService, IEditorGroupsService, ITextFileService} from '@codingame/monaco-vscode-api'
+import {initialize, getService, IEditorGroupsService, ISearchService, ITextFileService} from '@codingame/monaco-vscode-api'
+import {SearchProviderType} from '@codingame/monaco-vscode-api/vscode/vs/workbench/services/search/common/search'
 import {URI} from '@codingame/monaco-vscode-api/vscode/vs/base/common/uri'
 import {registerExtension, ExtensionHostKind} from '@codingame/monaco-vscode-api/extensions'
 import 'vscode/localExtensionHost'
@@ -31,6 +32,8 @@ import {captureTabs, openTabs} from './tabs.js'
 import {RunOutput} from './output.js'
 import {registerPreviews, runJavaScript} from './previews.js'
 import {ProjectFiles, request} from './project.js'
+import {ProjectSearch} from './search.js'
+import manifest from './package.json'
 
 window.MonacoEnvironment = {
   getWorker(_id, label) {
@@ -48,6 +51,7 @@ export async function start(t) {
   const info = await request('hello')
   const project = new ProjectFiles(info.active)
   const folder = URI.from({scheme:'studio', path:project.root})
+  const directoryWatch = project.watch(folder)
   registerCustomProvider('studio', project)
   await initialize({
     ...files(), ...configuration(), ...storage(), ...model(), ...languages(), ...textmate(),
@@ -67,13 +71,18 @@ export async function start(t) {
   const scripts = 'resourceScheme == studio && resourceExtname =~ /^(\\.py|\\.js|\\.mjs)$/i'
   const pythonFiles = 'resourceScheme == studio && resourceExtname =~ /^\\.py$/i'
   const previews = 'resourceScheme == studio && resourceExtname =~ /^(\\.html?|\\.md|\\.markdown)$/i'
+  const searchService = await getService(ISearchService)
+  const searchProvider = new ProjectSearch(project)
+  for (const type of [SearchProviderType.file, SearchProviderType.text]) {
+    searchService.registerSearchResultProvider(folder.scheme, type, searchProvider)
+  }
   const busy = id('running')
   const extension = registerExtension({
-    name:'workbench-actions', publisher:'pythonide', version:'0.2.1', engines:{vscode:'*'},
+    name:'workbench-actions', publisher:'pythonide', version:manifest.version, engines:{vscode:'*'},
     contributes:{
-      commands:['run','runWithArguments','preview','stop','project','close'].map(key => ({
+      commands:['run','runWithArguments','preview','stop','project','update','close'].map(key => ({
         command:id(key), title:t[key], category:'PythonIDE',
-        icon:'$(' + ({run:'play', runWithArguments:'play', preview:'open-preview', stop:'debug-stop', project:'folder-opened', close:'close'})[key] + ')'
+        icon:'$(' + ({run:'play', runWithArguments:'play', preview:'open-preview', stop:'debug-stop', project:'folder-opened', update:'cloud-download', close:'close'})[key] + ')'
       })),
       menus:{
         'editor/title':[
@@ -99,7 +108,7 @@ export async function start(t) {
   const drafts = new Drafts(api, project, t)
   const preview = registerPreviews(api, t, project)
   let job = {status:'idle', output:''}, mode = 'python', name = ''
-  let timer, generation = 0, busyAction = false, ended = false, lost = false, stopJS
+  let timer, generation = 0, busyAction = false, ended = false, lost = false, stopJS, updateRequest
   const dirty = () => api.workspace.textDocuments.filter(doc => doc.isDirty)
   const signature = () => JSON.stringify(dirty().map(doc => [doc.uri.toString(), doc.version]).sort())
   const alert = message => api.window.showErrorMessage(message)
@@ -235,6 +244,8 @@ export async function start(t) {
         await project.leave(next, {target:targetKey, discard, clearDrafts:discard ? drafts.references() : [],
           editors:captureTabs(api, groups, project)})
         ended = true
+        updateRequest?.abort()
+        directoryWatch.dispose()
         window.removeEventListener('beforeunload', beforeUnload)
         if (next === 'close') window.workbenchClosed()
         else location.reload()
@@ -261,6 +272,28 @@ export async function start(t) {
   }))
   api.commands.registerCommand(id('stop'), () => action(stop))
   api.commands.registerCommand(id('project'), pickProject)
+  api.commands.registerCommand(id('update'), async () => {
+    if (updateRequest || ended || project.leaving) return
+    updateRequest = new AbortController()
+    const {signal} = updateRequest
+    const call = async (action, fields) => {
+      const result = await request(action, {project:info.active.key, ...fields}, undefined, signal)
+      if (result.error) throw Error(t.updateErrors[result.error] || t.updateErrors.integrity)
+      return result
+    }
+    try {
+      await api.window.withProgress({location:api.ProgressLocation.Notification, title:t.update}, async () => {
+        const release = await call('checkUpdate')
+        if (ended || project.leaving) return
+        if (!release.version) { api.window.showInformationMessage(release.restart ? t.installed : t.upToDate); return }
+        const choice = await api.window.showInformationMessage(t.available(release.version), {modal:true}, t.install)
+        if (choice !== t.install || ended || project.leaving) return
+        await call('installUpdate', {version:release.version})
+        if (!ended && !project.leaving) api.window.showInformationMessage(t.installed)
+      })
+    } catch (error) { if (!signal.aborted && !ended) alert(error.message) }
+    finally { updateRequest = undefined }
+  })
   window.requestWorkbenchClose = () => leave('close')
   api.commands.registerCommand(id('close'), window.requestWorkbenchClose)
   for (const command of ['workbench.action.files.openFolder','workbench.action.files.openFolderViaWorkspace']) {
@@ -269,6 +302,7 @@ export async function start(t) {
   MenuRegistry.appendMenuItem(MenuId.TitleBar, {command:{id:id('close'), title:t.close, icon:Codicon.close}, group:'navigation', order:100})
   MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {command:{id:id('project'), title:t.project}, group:'2_open', order:2.5})
   MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {command:{id:id('close'), title:t.close}, group:'z_exit', order:100})
+  MenuRegistry.appendMenuItem(MenuId.MenubarHelpMenu, {command:{id:id('update'), title:t.update}, group:'z_updates'})
   await api.commands.executeCommand('workbench.view.explorer')
   await openTabs(api, project, folder, info.editors, info.entry)
   await drafts.restore(folder)
@@ -277,6 +311,6 @@ export async function start(t) {
   document.getElementById('loading').hidden = true
   window.addEventListener('beforeunload', beforeUnload)
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && !ended) { refresh(); drafts.flush().catch(() => {}) }
+    if (!document.hidden && !ended) { project.refreshFolders(); refresh(); drafts.flush().catch(() => {}) }
   })
 }

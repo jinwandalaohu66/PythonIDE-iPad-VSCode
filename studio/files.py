@@ -81,6 +81,15 @@ class Project:
             raise Problem("Unavailable", "The file exceeds 4 MiB.")
         return data
 
+    def listing(self, relative, previous=None):
+        # Read the stamp first so a concurrent directory change is picked up on the next poll.
+        node = self.path(relative, allow_root=True)
+        info = node.stat()
+        stamp = f"{info.st_ino}-{info.st_mtime_ns}-{info.st_ctime_ns}"
+        if stamp == previous:
+            return None
+        return {"stamp": stamp, "entries": self.children(relative)}
+
     def write(self, req):
         relative = req["path"]
         target = self.path(relative)
@@ -123,7 +132,20 @@ class Project:
         if action == "stat":
             return self.stat(rel)
         if action == "list":
-            return self.children(rel)
+            return self.listing(rel) if req.get("withStamp") else self.children(rel)
+        if action == "folderChanges":
+            folders = req["folders"]
+            if not isinstance(folders, dict) or len(folders) > 64:
+                raise Problem("Invalid", "Invalid folder selection.")
+            changes = {}
+            for path, stamp in folders.items():
+                try:
+                    current = self.listing(path, stamp)
+                except (FileNotFoundError, NotADirectoryError, PermissionError, Problem):
+                    current = {"entries": [], "stamp": None}
+                if current is not None:
+                    changes[path] = current
+            return changes
         if action == "read":
             data = self.read(rel)
             return {"bytes": base64.b64encode(data).decode("ascii"), "revision": digest(data)}

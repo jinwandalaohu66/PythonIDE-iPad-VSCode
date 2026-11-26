@@ -4,6 +4,8 @@
 
 在 iPad 上用熟悉的 Code-OSS 工作台编辑本地项目。你可以用 PythonIDE 的解释器运行 Python、在浏览器引擎中运行 JavaScript，也可以分栏预览 HTML 和 Markdown。工作台免费开源，Python 专业库沿用 PythonIDE 的会员规则。工作台界面支持英语和简体中文。
 
+**[在 App Store 下载 PythonIDE](https://apps.apple.com/app/id6753987304)**，然后在 iPad 上按下方步骤打开工作台。
+
 <p>
   <a href="https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/v0.2.1/screenshots/ipad-python.png"><img src="https://raw.githubusercontent.com/jinwandalaohu66/PythonIDE-iPad-VSCode/v0.2.1/screenshots/ipad-python.png" width="100%" alt="iPad 模拟器上运行 Python 并分栏显示 Markdown"></a>
 </p>
@@ -16,11 +18,13 @@
 
 ## 在 iPad 上打开
 
-1. 在提供启动脚本的 PythonIDE 版本中，从**本地工作区根目录**进入 **iPad VSCode** 文件夹，用普通编辑器打开 **`iPadVSCode.py`**，点 **▶**。首次运行从 GitHub 下载约 4.3 MiB，校验完成后自动打开 `Hello` 项目。[查看启动脚本](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/v0.2.1/WorkbenchLauncher/iPadVSCode.py)
+1. 在提供启动脚本的 PythonIDE 版本中，从**本地工作区根目录**进入 **iPad VSCode** 文件夹，用普通编辑器打开 **`iPadVSCode.py`**，点 **▶**。首次运行从 GitHub 下载与当前 PythonIDE 兼容的正式版，校验完成后自动打开 `Hello` 项目。[查看启动脚本](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/blob/main/WorkbenchLauncher/iPadVSCode.py)
 2. 在左侧打开 `main.py`，点编辑器标题栏的 **▶**，在下方查看输出。也可以运行 `demo.js`，或在 `index.html`、`notes.md` 中点预览图标。
 3. 下次仍然运行 **`iPadVSCode.py`**，已安装的工作台可以离线打开。下载中断后，重新运行即可重试。
 
-**手动安装**也可以使用支持相应工作台 API 的 PythonIDE 版本。[下载发行 ZIP](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/releases/download/v0.2.1/PythonIDEWorkbench.zip)，在「文件」中解压，把整个 `PythonIDEWorkbench` 文件夹放入 PythonIDE 的本地工作区。用普通编辑器打开**最外层的 `main.py`** 并点 ▶。包内的 `Projects/Hello/main.py` 是进入工作台后可以试跑的示例。
+在「帮助」菜单或命令面板中选择「检查工作台更新…」。确认安装后，关闭并重新打开工作台即可使用新版。平时打开无需联网。项目、示例中的改动、布局和草稿沿用原位置。首次从 0.2.1 迁移时，新启动器也会提供更新选项，之后可以用启动参数 `--update` 再次检查。 如果 App 里仍是旧启动器，可以从上面的「查看启动脚本」保存新版后运行。
+
+**手动安装**也可以使用支持相应工作台 API 的 PythonIDE 版本。[下载发行 ZIP](https://github.com/jinwandalaohu66/PythonIDE-iPad-VSCode/releases/latest/download/PythonIDEWorkbench.zip)，在「文件」中解压，把整个 `PythonIDEWorkbench` 文件夹放入 PythonIDE 的本地工作区。用普通编辑器打开**最外层的 `main.py`** 并点 ▶。包内的 `Projects/Hello/main.py` 是进入工作台后可以试跑的示例。
 
 自己的项目可以放在 `Projects/` 下，也可以放在工作台文件夹旁。添加文件夹后重开工作台，在「文件」菜单选择「打开项目文件夹…」。文件保存、命令面板、编辑器分栏和面板布局均使用 Code‑OSS 的标准操作。外接键盘可用 ⌘S 保存、⇧⌘P 搜索命令。右上角 × 关闭整个工作台。
 
@@ -49,6 +53,8 @@ JavaScript 脚本使用 Web API。需要 DOM 的代码从 HTML 页面启动。�
 
 本地运行一次执行一个前台任务。输出保留最近 65,536 个字符。仅打开可信的 Python 脚本，它与 PythonIDE 共用解释器及宿主授予的权限。工作台文件浏览限制在选中的项目，浏览器预览与编辑器相互隔离。删除的项目文件可在项目的 `.pythonide-trash/` 中找到。
 
+在资源管理器中可新建、重命名、移动或删除项目内的文件和文件夹。脚本写出的新文件会自动出现。快速打开可查文件名，搜索面板可在尚未打开的文件中查找内容。
+
 ## 桌面预览与开发
 
 需要 Python 3.11 或更新版本。将下面路径替换为自己的项目，访问终端打印的本机地址。
@@ -65,7 +71,7 @@ npm ci
 npm run build
 ```
 
-从包根目录运行 `python3 -m unittest discover -s tests` 可复查本地服务。运行 `python3 tools/package.py ../PythonIDEWorkbench.zip` 可从同一份源码和离线资源生成发行 ZIP。
+运行 `python3 -m unittest discover -s tests` 检查本地服务。发布时在包根目录运行 `python3 tools/package.py ../PythonIDEWorkbench.zip --channel releases.json --min-host 1.8.5`，将生成的 ZIP 和 `releases.json` 一起附到同一份正式 GitHub Release，再将该版设为 Latest。最低宿主版本应与实际验证版本相符。
 
 `main.py` 和 `studio/` 提供启动、文件、运行与恢复服务，`client/` 包含工作台适配源码，`web/` 是可直接运行的构建结果。编辑器使用公共 Code‑OSS 和 CodinGame Monaco VS Code API，依赖清单及上游版权文本位于 `licenses/`。本项目自行编写的部分采用 MIT 许可，见 `LICENSE`。第三方组件分别适用原有许可证。
 

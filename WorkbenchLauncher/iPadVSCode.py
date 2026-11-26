@@ -1,11 +1,13 @@
-"""Run in PythonIDE on iPad. The first run installs the pinned GitHub release."""
+"""Run in PythonIDE on iPad. Install a compatible official release and open the local workbench offline."""
 
+from contextlib import contextmanager
 import ctypes
 import hashlib
 import http.client
 import json
 import os
 from pathlib import Path, PurePosixPath
+import re
 import runpy
 import stat
 import sys
@@ -15,18 +17,25 @@ from urllib.request import Request, urlopen
 from zipfile import BadZipFile, ZipFile
 
 
-VERSION = "0.2.1"
+CHANNEL_FORMAT = 1
+MIN_HOST = "1.8.5"
+FACTORY_MAIN_021 = "6540dd405ea3ff5ac2f8201a3a0da52b24e043329da33cefcd2807544da8e643"
 REPO = "jinwandalaohu66/PythonIDE-iPad-VSCode"
 FOLDER = "PythonIDEWorkbench"
 ASSET = FOLDER + ".zip"
-RELEASE = f"https://github.com/{REPO}/releases/download/v{VERSION}/{ASSET}"
-API = f"https://api.github.com/repos/{REPO}/releases"
-DOWNLOAD_BYTES = 4516562
-SHA256 = "f0f78d1672c77dd9c134cebb848f8fdb1b47a152b3bdf45c71e7eb4a249cccfe"
+API = f"https://api.github.com/repos/{REPO}"
+CHANNEL = "releases.json"
+MAX_DOWNLOAD = 64 * 1024 * 1024
+NETWORK_ERRORS = (URLError, TimeoutError, ConnectionError, http.client.HTTPException)
 
 TEXT = {
     "en": {
-        "download": "Downloading workbench {version} from GitHub (4.3 MiB)…",
+        "modified": "Your original main.py has been edited. Keep this installation and install the newer release in a separate folder.",
+        "incompatible": "No release supports this version of PythonIDE.",
+        "check": "Check for Updates",
+        "offline": "Open Offline",
+        "older": "This installation predates in-workbench updates. Check GitHub now or open your installed version.",
+        "download": "Downloading workbench {version} from GitHub…",
         "progress": "Downloaded {percent}%",
         "open": "Opening the local workbench…",
         "network": "Couldn’t download the workbench. Check your connection and run this script again.",
@@ -36,7 +45,12 @@ TEXT = {
         "host": "Open this script in PythonIDE on iPad and tap Run."
     },
     "zh-Hans": {
-        "download": "正在从 GitHub 下载工作台 {version}（约 4.3 MiB）…",
+        "modified": "原来的 main.py 已被修改。请保留这份工作台，将新版单独安装到另一个文件夹。",
+        "incompatible": "当前 PythonIDE 版本没有兼容的工作台发行版。",
+        "check": "检查更新",
+        "offline": "离线打开",
+        "older": "此版本还没有工作台内更新菜单。可以现在检查 GitHub，也可以直接打开已安装的版本。",
+        "download": "正在从 GitHub 下载工作台 {version}…",
         "progress": "已下载 {percent}%",
         "open": "正在打开本地工作台…",
         "network": "未能下载工作台。请检查网络后重新运行本脚本。",
@@ -46,7 +60,12 @@ TEXT = {
         "host": "请在 iPad 的 PythonIDE 中打开此脚本并点运行。"
     },
     "zh-Hant": {
-        "download": "正在從 GitHub 下載工作台 {version}（約 4.3 MiB）…",
+        "modified": "原本的 main.py 已經修改。請保留這份工作台，將新版另行安裝至其他資料夾。",
+        "incompatible": "此 PythonIDE 版本沒有相容的工作台版本。",
+        "check": "檢查更新",
+        "offline": "離線開啟",
+        "older": "此版本尚未提供工作台內的更新選單。你可以立即檢查 GitHub，或直接開啟已安裝的版本。",
+        "download": "正在從 GitHub 下載工作台 {version}…",
         "progress": "已下載 {percent}%",
         "open": "正在開啟本機工作台…",
         "network": "無法下載工作台。請檢查網路連線後再次執行此指令稿。",
@@ -56,7 +75,12 @@ TEXT = {
         "host": "請在 iPad 的 PythonIDE 中開啟此指令稿並點選執行。"
     },
     "de": {
-        "download": "Arbeitsumgebung {version} wird von GitHub geladen (4,3 MiB)…",
+        "modified": "Deine ursprüngliche main.py wurde bearbeitet. Behalte diese Installation und installiere die neue Version in einem separaten Ordner.",
+        "incompatible": "Für diese PythonIDE-Version ist kein kompatibles Release verfügbar.",
+        "check": "Nach Updates suchen",
+        "offline": "Offline öffnen",
+        "older": "Diese Version hat noch kein Update-Menü. Suche auf GitHub nach Updates oder öffne die installierte Version.",
+        "download": "Arbeitsumgebung {version} wird von GitHub geladen…",
         "progress": "{percent} % heruntergeladen",
         "open": "Lokale Arbeitsumgebung wird geöffnet…",
         "network": "Download fehlgeschlagen. Prüfe die Internetverbindung und führe das Skript erneut aus.",
@@ -66,7 +90,12 @@ TEXT = {
         "host": "Öffne dieses Skript in PythonIDE auf dem iPad und tippe auf Ausführen."
     },
     "es": {
-        "download": "Descargando el entorno {version} desde GitHub (4,3 MiB)…",
+        "modified": "El archivo main.py original se ha modificado. Conserva esta instalación e instala la versión nueva en otra carpeta.",
+        "incompatible": "No hay una edición compatible con esta versión de PythonIDE.",
+        "check": "Buscar actualizaciones",
+        "offline": "Abrir sin conexión",
+        "older": "Esta versión aún no tiene menú de actualizaciones. Busca una versión en GitHub o abre la que tienes instalada.",
+        "download": "Descargando el entorno {version} desde GitHub…",
         "progress": "Descarga al {percent} %",
         "open": "Abriendo el entorno local…",
         "network": "No se ha podido descargar el entorno. Comprueba la conexión y vuelve a ejecutar el script.",
@@ -76,7 +105,12 @@ TEXT = {
         "host": "Abre este script en PythonIDE en el iPad y toca Ejecutar."
     },
     "fr": {
-        "download": "Téléchargement de l’atelier {version} depuis GitHub (4,3 Mio)…",
+        "modified": "Le fichier main.py d’origine a été modifié. Conservez cette installation et placez la nouvelle version dans un autre dossier.",
+        "incompatible": "Aucune version de l’atelier n’est compatible avec cette version de PythonIDE.",
+        "check": "Rechercher une mise à jour",
+        "offline": "Ouvrir hors ligne",
+        "older": "Cette version ne propose pas encore de menu de mise à jour. Vérifiez sur GitHub ou ouvrez la version installée.",
+        "download": "Téléchargement de l’atelier {version} depuis GitHub…",
         "progress": "{percent} % téléchargés",
         "open": "Ouverture de l’atelier local…",
         "network": "Impossible de télécharger l’atelier. Vérifiez la connexion et relancez ce script.",
@@ -86,7 +120,12 @@ TEXT = {
         "host": "Ouvrez ce script dans PythonIDE sur iPad et touchez Exécuter."
     },
     "ja": {
-        "download": "GitHub からワークベンチ {version}（約 4.3 MiB）をダウンロード中…",
+        "modified": "元の main.py が変更されています。この環境を残し、新しいバージョンを別のフォルダにインストールしてください。",
+        "incompatible": "この PythonIDE に対応するリリースがありません。",
+        "check": "アップデートを確認",
+        "offline": "オフラインで開く",
+        "older": "このバージョンには更新メニューがありません。GitHub で更新を確認するか、インストール済みのバージョンを開けます。",
+        "download": "GitHub からワークベンチ {version}をダウンロード中…",
         "progress": "{percent}% ダウンロード済み",
         "open": "ローカルのワークベンチを開いています…",
         "network": "ダウンロードできませんでした。ネットワーク接続を確認し、このスクリプトをもう一度実行してください。",
@@ -96,7 +135,12 @@ TEXT = {
         "host": "iPad の PythonIDE でこのスクリプトを開き、実行をタップしてください。"
     },
     "ko": {
-        "download": "GitHub에서 워크벤치 {version} 다운로드 중(약 4.3 MiB)…",
+        "modified": "원래 main.py 파일이 수정되었습니다. 이 설치본을 보관하고 새 버전은 다른 폴더에 설치하세요.",
+        "incompatible": "이 PythonIDE 버전과 호환되는 릴리스가 없습니다.",
+        "check": "업데이트 확인",
+        "offline": "오프라인으로 열기",
+        "older": "설치된 버전에는 업데이트 메뉴가 없습니다. GitHub에서 업데이트를 확인하거나 현재 버전을 여세요.",
+        "download": "GitHub에서 워크벤치 {version} 다운로드 중…",
         "progress": "{percent}% 다운로드됨",
         "open": "로컬 워크벤치를 여는 중…",
         "network": "워크벤치를 다운로드하지 못했습니다. 네트워크 연결을 확인한 후 스크립트를 다시 실행하세요.",
@@ -106,7 +150,12 @@ TEXT = {
         "host": "iPad의 PythonIDE에서 이 스크립트를 열고 실행을 누르세요."
     },
     "pt-BR": {
-        "download": "Baixando o ambiente {version} do GitHub (4,3 MiB)…",
+        "modified": "O arquivo main.py original foi editado. Mantenha esta instalação e instale a nova versão em outra pasta.",
+        "incompatible": "Nenhuma versão do ambiente é compatível com esta versão do PythonIDE.",
+        "check": "Verificar atualizações",
+        "offline": "Abrir offline",
+        "older": "Esta versão ainda não tem menu de atualizações. Consulte o GitHub ou abra a versão instalada.",
+        "download": "Baixando o ambiente {version} do GitHub…",
         "progress": "Download em {percent}%",
         "open": "Abrindo o ambiente local…",
         "network": "Não foi possível baixar o ambiente. Verifique a conexão e execute o script novamente.",
@@ -116,7 +165,12 @@ TEXT = {
         "host": "Abra este script no PythonIDE no iPad e toque em Executar."
     },
     "ru": {
-        "download": "Загрузка рабочей среды {version} с GitHub (4,3 МиБ)…",
+        "modified": "Исходный файл main.py изменён. Сохраните эту копию и установите новую версию в отдельную папку.",
+        "incompatible": "Для этой версии PythonIDE нет совместимого выпуска.",
+        "check": "Проверить обновления",
+        "offline": "Открыть без сети",
+        "older": "В этой версии пока нет меню обновлений. Проверьте обновления на GitHub или откройте установленную версию.",
+        "download": "Загрузка рабочей среды {version} с GitHub…",
         "progress": "Загружено {percent}%",
         "open": "Открытие локальной рабочей среды…",
         "network": "Не удалось загрузить рабочую среду. Проверьте соединение и запустите скрипт ещё раз.",
@@ -167,27 +221,89 @@ def installed_entry(folder):
     raise InstallError("conflict")
 
 
+def version_key(value):
+    if not isinstance(value, str) or not re.fullmatch(r"(0|[1-9][0-9]{0,5})(\.(0|[1-9][0-9]{0,5})){2}", value):
+        raise ValueError("Invalid release version")
+    return tuple(map(int, value.split(".")))
+
+
+def host_version():
+    try:
+        from objc_util import ObjCClass
+        return str(ObjCClass("NSBundle").mainBundle().objectForInfoDictionaryKey_("CFBundleShortVersionString"))
+    except ImportError:
+        return MIN_HOST  # Desktop preview uses the oldest supported host contract.
+
+
+def package_version(folder):
+    return json.loads((folder / "client/package.json").read_text(encoding="utf-8"))["version"]
+
+
 def open_url(url, accept):
-    request = Request(url, headers={"Accept": accept, "User-Agent": "PythonIDE-iPadVSCode/" + VERSION})
+    request = Request(url, headers={"Accept": accept, "User-Agent": "PythonIDE-WorkbenchInstaller/1"})
     return urlopen(request, timeout=20)
 
 
-def download_urls():
-    yield RELEASE
-    # Both routes are operated by GitHub. Some networks can reach only its API.
-    with open_url(API + "/tags/v" + VERSION, "application/vnd.github+json") as response:
-        metadata = json.loads(response.read(512 * 1024))
+def asset_url(metadata, name):
+    if metadata.get("draft") or metadata.get("prerelease"):
+        return None
     for asset in metadata["assets"]:
-        if asset["name"] == ASSET and type(asset["id"]) is int:
-            yield f"{API}/assets/{asset['id']}?download=1"
-            return
+        if asset["name"] == name and type(asset["id"]) is int:
+            return f"{API}/releases/assets/{asset['id']}?download=1"
+    return None
 
 
-def fetch(target, strings):
-    network_errors = (URLError, TimeoutError, ConnectionError, http.client.HTTPException)
+def latest_release(host):
+    last_error = "network"
+    for route in ("direct", "api"):
+        try:
+            url = f"https://github.com/{REPO}/releases/latest/download/{CHANNEL}"
+            if route == "api":
+                with open_url(API + "/releases/latest", "application/vnd.github+json") as response:
+                    url = asset_url(json.loads(response.read(512 * 1024)), CHANNEL)
+                if not url:
+                    continue
+            with open_url(url, "application/octet-stream") as response:
+                raw = response.read(128 * 1024 + 1)
+            if len(raw) > 128 * 1024:
+                raise ValueError
+            catalog = json.loads(raw)
+            if catalog["schema"] != CHANNEL_FORMAT:
+                raise ValueError
+            supported = []
+            for release in catalog["releases"]:
+                version_key(release["version"])
+                if (version_key(release["minHost"]) <= version_key(host)
+                        and type(release["bytes"]) is int and 0 < release["bytes"] <= MAX_DOWNLOAD
+                        and re.fullmatch(r"[0-9a-f]{64}", release["sha256"])):
+                    supported.append(release)
+            if supported:
+                return max(supported, key=lambda r: version_key(r["version"]))
+            raise InstallError("incompatible")
+        except NETWORK_ERRORS:
+            continue
+        except (KeyError, AttributeError, TypeError, ValueError):
+            last_error = "integrity"
+            continue
+    raise InstallError(last_error)
+
+
+def download_urls(version):
+    yield f"https://github.com/{REPO}/releases/download/v{version}/{ASSET}"
+    with open_url(f"{API}/releases/tags/v{version}", "application/vnd.github+json") as response:
+        metadata = json.loads(response.read(512 * 1024))
+    if metadata.get("tag_name") != "v" + version or metadata.get("draft") or metadata.get("prerelease"):
+        return
+    fallback = asset_url(metadata, ASSET)
+    if fallback:
+        yield fallback
+
+
+def fetch(target, release, strings):
+    size = release["bytes"]
     last_error = "network"
     try:
-        for url in download_urls():
+        for url in download_urls(release["version"]):
             try:
                 with open_url(url, "application/octet-stream") as response, target.open("wb") as stream:
                     digest = hashlib.sha256()
@@ -195,20 +311,20 @@ def fetch(target, strings):
                     next_update = 25
                     while block := response.read(64 * 1024):
                         received += len(block)
-                        if received > DOWNLOAD_BYTES:
+                        if received > size:
                             break
                         digest.update(block)
                         stream.write(block)
-                        percent = received * 100 // DOWNLOAD_BYTES
-                        if percent >= next_update:
+                        percent = received * 100 // size
+                        if strings and percent >= next_update:
                             print(strings["progress"].format(percent=percent), flush=True)
                             next_update = (percent // 25 + 1) * 25
-                    if received == DOWNLOAD_BYTES and digest.hexdigest() == SHA256:
+                    if received == size and digest.hexdigest() == release["sha256"]:
                         return
                     last_error = "integrity"
-            except network_errors:
+            except NETWORK_ERRORS:
                 continue
-    except (*network_errors, KeyError, TypeError, ValueError):
+    except (*NETWORK_ERRORS, KeyError, TypeError, ValueError):
         pass
     raise InstallError(last_error)
 
@@ -230,35 +346,141 @@ def publish(source, destination):
         source.rename(destination)
 
 
-def ensure_installed(workspace, strings):
+@contextmanager
+def prepared(workspace, release, strings=None):
+    workspace.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".ipadvscode-", dir=workspace) as staging:
+        staged = Path(staging)
+        path = staged / ASSET
+        fetch(path, release, strings)
+        with ZipFile(path) as archive:
+            members = archive.infolist()
+            if len(members) > 12000 or sum(x.file_size for x in members) > 256 * 1024 * 1024:
+                raise InstallError("integrity")
+            seen = set()
+            for member in members:
+                name = PurePosixPath(member.filename)
+                if (not name.parts or name.parts[0] != FOLDER or ".." in name.parts
+                        or "\\" in member.filename or stat.S_ISLNK(member.external_attr >> 16)
+                        or any(p.startswith(".workbench-") for p in name.parts) or name in seen):
+                    raise InstallError("integrity")
+                seen.add(name)
+            archive.extractall(staged)
+        program = staged / FOLDER
+        if not installed_entry(program) or package_version(program) != release["version"]:
+            raise InstallError("integrity")
+        yield program
+
+
+def ensure_installed(workspace, strings, host=None):
     destination = workspace / FOLDER
     entry = installed_entry(destination)
     if entry:
         return entry
-    print(strings["download"].format(version=VERSION), flush=True)
-    workspace.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix=".ipadvscode-", dir=workspace) as staging:
-        staged = Path(staging)
-        archive_path = staged / ASSET
-        fetch(archive_path, strings)
-        with ZipFile(archive_path) as archive:
-            for member in archive.infolist():
-                path = PurePosixPath(member.filename)
-                if (not path.parts or path.parts[0] != FOLDER or ".." in path.parts
-                        or "\\" in member.filename or stat.S_ISLNK(member.external_attr >> 16)):
-                    raise InstallError("integrity")
-            archive.extractall(staged)
-        if not installed_entry(staged / FOLDER):
-            raise InstallError("integrity")
+    release = latest_release(host or host_version())
+    print(strings["download"].format(version=release["version"]), flush=True)
+    with prepared(workspace, release, strings) as program:
         try:
-            publish(staged / FOLDER, destination)
+            publish(program, destination)
         except FileExistsError:
-            # Another invocation finished while this one downloaded.
-            entry = installed_entry(destination)
-            if entry is None:
+            if not installed_entry(destination):
                 raise InstallError("conflict") from None
-            return entry
     return destination / "main.py"
+
+
+def atomic_write(target, data):
+    with tempfile.NamedTemporaryFile(dir=target.parent, delete=False) as output:
+        temp = Path(output.name)
+        try:
+            output.write(data)
+            output.flush()
+            os.fsync(output.fileno())
+            output.close()
+            temp.replace(target)
+        finally:
+            temp.unlink(missing_ok=True)
+
+
+def selected_version(home):
+    base = package_version(home)
+    store = home / ".workbench-updates"
+    pointer = store / "current"
+    if store.is_symlink() or pointer.is_symlink():
+        raise InstallError("conflict")
+    if pointer.exists():
+        try:
+            value = pointer.read_text(encoding="ascii").strip()
+            version_key(value)
+            program = store / value
+            if installed_entry(program) and package_version(program) == value:
+                return value
+        except (ValueError, KeyError, InstallError):
+            pass
+    return base
+
+
+@contextmanager
+def update_lock(store):
+    if store.is_symlink():
+        raise InstallError("conflict")
+    if os.name == "nt":
+        import msvcrt
+        marker = store / ".lock"
+        if marker.is_symlink():
+            raise InstallError("conflict")
+        with marker.open("a+b") as handle:
+            if handle.tell() == 0:
+                handle.write(b"0")
+                handle.flush()
+            handle.seek(0)
+            msvcrt.locking(handle.fileno(), msvcrt.LK_LOCK, 1)
+            try:
+                yield
+            finally:
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+    else:
+        import fcntl
+        descriptor = os.open(store, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+            yield
+        finally:
+            os.close(descriptor)
+
+
+def install_update(home, release, strings=None):
+    home = home.resolve(strict=True)
+    version = release["version"]
+    if version_key(version) <= version_key(selected_version(home)):
+        return
+    with prepared(home.parent, release, strings) as program:
+        store = home / ".workbench-updates"
+        store.mkdir(exist_ok=True)
+        with update_lock(store):
+            if version_key(version) <= version_key(selected_version(home)):
+                return
+            entry = home / "main.py"
+            migrate = version_key(selected_version(home)) < (0, 2, 2)
+            # Only migrate the published 0.2.1 entry. An interrupted migration may already have written the dispatcher.
+            main_bytes = (program / "main.py").read_bytes()
+            if migrate:
+                original = entry.read_bytes()
+                if original != main_bytes and hashlib.sha256(original).hexdigest() != FACTORY_MAIN_021:
+                    raise InstallError("modified")
+            target = store / version
+            if os.path.lexists(target):
+                if not installed_entry(target) or any(
+                        p.is_file() and (not (target / p.relative_to(program)).is_file()
+                        or (target / p.relative_to(program)).resolve() != target / p.relative_to(program)
+                        or (target / p.relative_to(program)).read_bytes() != p.read_bytes())
+                        for p in program.rglob("*")):
+                    raise InstallError("conflict")
+            else:
+                publish(program, target)
+            if migrate and hashlib.sha256(entry.read_bytes()).hexdigest() == FACTORY_MAIN_021:
+                atomic_write(entry, main_bytes)
+            atomic_write(store / "current", version.encode("ascii"))
 
 
 def main():
@@ -269,7 +491,23 @@ def main():
     strings = TEXT[code]
     try:
         entry = ensure_installed(workspace, strings)
-    except (InstallError, OSError, BadZipFile) as error:
+        home = entry.parent
+        explicit = "--update" in sys.argv[1:]
+        previous = version_key(selected_version(home))
+        if not explicit and previous < (0, 2, 2):
+            offered = home / ".workbench-update-offered"
+            if not os.path.lexists(offered):
+                import console
+                explicit = console.alert("iPad VSCode", strings["older"], button1=strings["check"],
+                                         button2=strings["offline"], hide_cancel_button=True) == 1
+                offered.touch(exist_ok=True)
+        if explicit:
+            try:
+                install_update(home, latest_release(host_version()), strings)
+            except (OSError, BadZipFile, InstallError, ValueError) as error:
+                key = error.args[0] if isinstance(error, InstallError) else "storage"
+                print(strings.get(key, strings["integrity"]), file=sys.stderr, flush=True)
+    except (InstallError, OSError, BadZipFile, ValueError) as error:
         key = error.args[0] if isinstance(error, InstallError) else (
             "integrity" if isinstance(error, BadZipFile) else "storage")
         print(strings[key], file=sys.stderr, flush=True)

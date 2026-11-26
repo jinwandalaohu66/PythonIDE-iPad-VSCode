@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "releases": [
+    {
+      "version": "0.2.2",
+      "minHost": "1.8.5",
+      "bytes": 4577716,
+      "sha256": "58d14cd2478e3935c4dc7521f2978d06b580993fcaa56f33147622876c097df4"
+    },
+    {
+      "version": "0.2.1",
+      "minHost": "1.8.5",
+      "bytes": 4516562,
+      "sha256": "f0f78d1672c77dd9c134cebb848f8fdb1b47a152b3bdf45c71e7eb4a249cccfe"
+    }
+  ]
+}
